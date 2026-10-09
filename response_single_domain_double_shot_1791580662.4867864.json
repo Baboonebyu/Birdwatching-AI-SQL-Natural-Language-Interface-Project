@@ -1,0 +1,13 @@
+{
+  "strategy": "single_domain_double_shot",
+  "prompt_prefix": "PRAGMA foreign_keys = ON;\n\nCREATE TABLE `Species`(\n    `Species_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `avg_Wingspan` REAL NOT NULL,\n    `avg_Lifespan` REAL NOT NULL,\n    `diet` TEXT NOT NULL CHECK (`diet` IN ('insects', 'rodents', 'birds', 'seeds', 'fruit', 'fish', 'unknown')),\n    `common name` TEXT NOT NULL,\n    `scientific name` TEXT NOT NULL\n);\n\nCREATE TABLE `users`(\n    `user_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `username` TEXT NOT NULL,\n    `date_Joined` TEXT NOT NULL\n);\n\nCREATE TABLE `Bird`(\n    `id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `Species_id` INTEGER NOT NULL,\n    `Name` TEXT NULL,\n    FOREIGN KEY (`Species_id`) REFERENCES `Species`(`Species_id`)\n);\n\nCREATE TABLE `Bird Sighting`(\n    `sighting_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `bird_id` INTEGER NOT NULL,\n    `person_id` INTEGER NOT NULL,\n    `location` TEXT NOT NULL,\n    `Sighting date` TEXT NOT NULL,\n    FOREIGN KEY (`bird_id`) REFERENCES `Bird`(`id`),\n    FOREIGN KEY (`person_id`) REFERENCES `users`(`user_id`)\n);\n What bird has been seen the most?  \nSELECT b.id, b.Name, COUNT(*) AS sighting_count\nFROM Bird b\nJOIN `Bird Sighting` bs ON b.id = bs.bird_id\nGROUP BY b.id, b.Name\nORDER BY sighting_count DESC\nLIMIT 1;\n  Give me a sqlite select statement that answers the question. Only respond with sqlite syntax. If there is an error do not explain it!",
+  "questionResults": [
+    {
+      "question": "Who has seen the most birds",
+      "sql": "SELECT u.user_id, u.username, COUNT(DISTINCT bs.bird_id) AS birds_seen_count\nFROM users u\nJOIN `Bird Sighting` bs ON u.user_id = bs.person_id\nGROUP BY u.user_id, u.username\nORDER BY birds_seen_count DESC\nLIMIT 1;",
+      "queryRawResponse": "[(5, 'sydney_sky_spotter', 10)]",
+      "friendlyResponse": "Sydney_sky_spotter has seen the most birds, with a count of 10.",
+      "error": "None"
+    }
+  ]
+}

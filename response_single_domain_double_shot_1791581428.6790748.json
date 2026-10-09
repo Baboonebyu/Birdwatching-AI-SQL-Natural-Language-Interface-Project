@@ -1,0 +1,27 @@
+{
+  "strategy": "single_domain_double_shot",
+  "prompt_prefix": "PRAGMA foreign_keys = ON;\n\nCREATE TABLE `Species`(\n    `Species_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `avg_Wingspan` REAL NOT NULL,\n    `avg_Lifespan` REAL NOT NULL,\n    `diet` TEXT NOT NULL CHECK (`diet` IN ('insects', 'rodents', 'birds', 'seeds', 'fruit', 'fish', 'unknown')),\n    `common name` TEXT NOT NULL,\n    `scientific name` TEXT NOT NULL\n);\n\nCREATE TABLE `users`(\n    `user_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `username` TEXT NOT NULL,\n    `date_Joined` TEXT NOT NULL\n);\n\nCREATE TABLE `Bird`(\n    `id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `Species_id` INTEGER NOT NULL,\n    `Name` TEXT NULL,\n    FOREIGN KEY (`Species_id`) REFERENCES `Species`(`Species_id`)\n);\n\nCREATE TABLE `Bird Sighting`(\n    `sighting_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `bird_id` INTEGER NOT NULL,\n    `person_id` INTEGER NOT NULL,\n    `location` TEXT NOT NULL,\n    `Sighting date` TEXT NOT NULL,\n    FOREIGN KEY (`bird_id`) REFERENCES `Bird`(`id`),\n    FOREIGN KEY (`person_id`) REFERENCES `users`(`user_id`)\n);\n What bird has been seen the most?  \nSELECT b.id, b.Name, COUNT(*) AS sighting_count\nFROM Bird b\nJOIN `Bird Sighting` bs ON b.id = bs.bird_id\nGROUP BY b.id, b.Name\nORDER BY sighting_count DESC\nLIMIT 1;\n  Give me a sqlite select statement that answers the question. Only respond with sqlite syntax. If there is an error do not explain it!",
+  "questionResults": [
+    {
+      "question": "Is there a bird who has never been seen?",
+      "sql": "SELECT b.id, b.Name\nFROM Bird b\nLEFT JOIN `Bird Sighting` bs ON b.id = bs.bird_id\nWHERE bs.sighting_id IS NULL;",
+      "queryRawResponse": "[(3, 'Pip'), (6, 'Liberty'), (9, 'Talon'), (13, 'Waddles'), (16, 'Azure'), (20, 'Cobalt'), (24, 'Merlin')]",
+      "friendlyResponse": "No known bird has never been seen.",
+      "error": "None"
+    },
+    {
+      "question": "what bird has been seen by the widest amount of users?",
+      "sql": "SELECT b.id, b.Name, COUNT(DISTINCT bs.person_id) AS unique_user_count\nFROM Bird b\nJOIN `Bird Sighting` bs ON b.id = bs.bird_id\nGROUP BY b.id, b.Name\nORDER BY unique_user_count DESC\nLIMIT 1;",
+      "queryRawResponse": "[(1, 'Rusty', 6)]",
+      "friendlyResponse": "The bird seen by the most users is the Rusty, with 6 users reporting it.",
+      "error": "None"
+    },
+    {
+      "question": "What bird if any has been seen on a tuesday",
+      "sql": "SELECT DISTINCT b.id, b.Name\nFROM Bird b\nJOIN `Bird Sighting` bs ON b.id = bs.bird_id\nWHERE strftime('%w', bs.`Sighting date`) = '2';",
+      "queryRawResponse": "[(11, 'Donald'), (12, 'Daisy'), (19, 'Indigo')]",
+      "friendlyResponse": "Birds sighted on a Tuesday: Donald, Daisy, Indigo.",
+      "error": "None"
+    }
+  ]
+}

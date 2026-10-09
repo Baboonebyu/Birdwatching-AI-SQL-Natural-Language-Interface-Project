@@ -1,0 +1,27 @@
+{
+  "strategy": "zero_shot",
+  "prompt_prefix": "PRAGMA foreign_keys = ON;\n\nCREATE TABLE `Species`(\n    `Species_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `avg_Wingspan` REAL NOT NULL,\n    `avg_Lifespan` REAL NOT NULL,\n    `diet` TEXT NOT NULL CHECK (`diet` IN ('insects', 'rodents', 'birds', 'seeds', 'fruit', 'fish', 'unknown')),\n    `common name` TEXT NOT NULL,\n    `scientific name` TEXT NOT NULL\n);\n\nCREATE TABLE `users`(\n    `user_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `username` TEXT NOT NULL,\n    `date_Joined` TEXT NOT NULL\n);\n\nCREATE TABLE `Bird`(\n    `id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `Species_id` INTEGER NOT NULL,\n    `Name` TEXT NULL,\n    FOREIGN KEY (`Species_id`) REFERENCES `Species`(`Species_id`)\n);\n\nCREATE TABLE `Bird Sighting`(\n    `sighting_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `bird_id` INTEGER NOT NULL,\n    `person_id` INTEGER NOT NULL,\n    `location` TEXT NOT NULL,\n    `Sighting date` TEXT NOT NULL,\n    FOREIGN KEY (`bird_id`) REFERENCES `Bird`(`id`),\n    FOREIGN KEY (`person_id`) REFERENCES `users`(`user_id`)\n);\n Give me a sqlite select statement that answers the question. Only respond with sqlite syntax. If there is an error do not explain it!",
+  "questionResults": [
+    {
+      "question": "Who has seen the most individual birds",
+      "sql": "SELECT u.username, COUNT(DISTINCT b.id) AS unique_birds_seen\nFROM `Bird Sighting` bs\nJOIN `users` u ON bs.person_id = u.user_id\nJOIN `Bird` b ON bs.bird_id = b.id\nGROUP BY u.user_id\nORDER BY unique_birds_seen DESC\nLIMIT 1;",
+      "queryRawResponse": "[('sydney_sky_spotter', 10)]",
+      "friendlyResponse": "The individual who has seen the most birds is \"sydney_sky_spotter\" with 10 sightings.",
+      "error": "None"
+    },
+    {
+      "question": "Who has been a user the longest",
+      "sql": "SELECT username FROM users ORDER BY date_Joined LIMIT 1;",
+      "queryRawResponse": "[('birdwatcher_laura',)]",
+      "friendlyResponse": "The longest user is birdwatcher_laura.",
+      "error": "None"
+    },
+    {
+      "question": "What was the common name of the last bird seen by Sydney_sky_spotter",
+      "sql": "SELECT `Species`.`common name` \nFROM `Bird Sighting` \nJOIN `users` ON `Bird Sighting`.`person_id` = `users`.`user_id`\nJOIN `Bird` ON `Bird Sighting`.`bird_id` = `Bird`.`id`\nJOIN `Species` ON `Bird`.`Species_id` = `Species`.`Species_id`\nWHERE `users`.`username` = 'Sydney_sky_spotter'\nORDER BY `Bird Sighting`.`Sighting date` DESC\nLIMIT 1;",
+      "queryRawResponse": "[]",
+      "friendlyResponse": "I'm sorry, but I don't have access to real-time data, including Sydney_sky_spotter's bird sightings.",
+      "error": "None"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "strategy": "zero_shot",
+  "prompt_prefix": "PRAGMA foreign_keys = ON;\n\nCREATE TABLE `Species`(\n    `Species_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `avg_Wingspan` REAL NOT NULL,\n    `avg_Lifespan` REAL NOT NULL,\n    `diet` TEXT NOT NULL CHECK (`diet` IN ('insects', 'rodents', 'birds', 'seeds', 'fruit', 'fish', 'unknown')),\n    `common name` TEXT NOT NULL,\n    `scientific name` TEXT NOT NULL\n);\n\nCREATE TABLE `users`(\n    `user_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `username` TEXT NOT NULL,\n    `date_Joined` TEXT NOT NULL\n);\n\nCREATE TABLE `Bird`(\n    `id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `Species_id` INTEGER NOT NULL,\n    `Name` TEXT NULL,\n    FOREIGN KEY (`Species_id`) REFERENCES `Species`(`Species_id`)\n);\n\nCREATE TABLE `Bird Sighting`(\n    `sighting_id` INTEGER PRIMARY KEY AUTOINCREMENT,\n    `bird_id` INTEGER NOT NULL,\n    `person_id` INTEGER NOT NULL,\n    `location` TEXT NOT NULL,\n    `Sighting date` TEXT NOT NULL,\n    FOREIGN KEY (`bird_id`) REFERENCES `Bird`(`id`),\n    FOREIGN KEY (`person_id`) REFERENCES `users`(`user_id`)\n);\n Give me a sqlite select statement that answers the question. Only respond with sqlite syntax. If there is an error do not explain it!",
+  "questionResults": [
+    {
+      "question": "What species has the longest wingspan",
+      "sql": "SELECT `common name`, `scientific name`, `avg_Wingspan`\nFROM `Species`\nORDER BY `avg_Wingspan` DESC\nLIMIT 1;",
+      "queryRawResponse": "[('Bald Eagle', 'Haliaeetus leucocephalus', 200.0)]",
+      "friendlyResponse": "The Bald Eagle, with its wingspan of 200 cm (about 6.5 feet), is noted for its impressive wingspan.",
+      "error": "None"
+    }
+  ]
+}
