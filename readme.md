@@ -1,6 +1,6 @@
 # Note
 most of this was pulled from professor Reynolds project. I just took it and plugged in my own database, questions, and example prompts
-
+![mysql drawing](drawSQL-image-export-2026-10-09.webp)
 
 
 This database I created has a bit of fake data about birds and birdwatching. We store various birds and users and also what birds were seen by who and different species info for each bird. This could be the foundation for a simple bird watching/tracking app. 
